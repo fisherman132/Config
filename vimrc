@@ -1,48 +1,9 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Maintainer: 
-"       Amir Salihefendic
-"       http://amix.dk - amix@amix.dk
-"
-" Version: 
-"       5.0 - 29/05/12 15:43:36
-"
-" Blog_post: 
-"       http://amix.dk/blog/post/19691#The-ultimate-Vim-configuration-on-Github
-"
-" Awesome_version:
-"       Get this config, nice color schemes and lots of plugins!
-"
-"       Install the awesome version from:
-"
-"           https://github.com/amix/vimrc
-"
-" Syntax_highlighted:
-"       http://amix.dk/vim/vimrc.html
-"
-" Raw_version: 
-"       http://amix.dk/vim/vimrc.txt
-"
-" Sections:
-"    -> General
-"    -> VIM user interface
-"    -> Colors and Fonts
-"    -> Files and backups
-"    -> Text, tab and indent related
-"    -> Visual mode related
-"    -> Moving around, tabs and buffers
-"    -> Status line
-"    -> Editing mappings
-"    -> vimgrep searching and cope displaying
-"    -> Spell checking
-"    -> Misc
-"    -> Helper functions
-"
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Sets how many lines of history VIM has to remember
 set history=500
 
@@ -53,17 +14,20 @@ filetype indent on
 " Set to auto read when a file is changed from the outside
 set autoread
 
+" Set show num
+set nu
+
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
 let mapleader = ","
 let g:mapleader = ","
 
 " Fast saving
-nmap <leader>w :w!<cr>
+"# nmap <leader>w :w!<cr>
 
 " :W sudo saves the file 
 " (useful for handling the permission-denied error)
-command W w !sudo tee % > /dev/null
+:w !sudo tee % > /dev/null
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -78,7 +42,8 @@ set langmenu=en
 source $VIMRUNTIME/delmenu.vim
 source $VIMRUNTIME/menu.vim
 
-" Turn on the WiLd menu
+"在命令模式下使用 Tab 自动补全的时候，
+"将补全内容使用一个漂亮的单行菜单形式显示出来。
 set wildmenu
 
 " Ignore compiled files
@@ -89,8 +54,24 @@ else
     set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
 endif
 
-"Always show current position
+"该命令打开 VIM 的状态栏标尺。 默认情况下， VIM 的状态栏标尺在屏幕底部， 它能即时显示当前光标所在位置在文件中的行号、列号， 以及对应的整个文件的百分比。 
 set ruler
+
+"该命令指定让 VIM 工作在与vi不兼容模式下。
+set nocp
+
+set sw=4
+"自动缩进的时候， 缩进尺寸为 4 个空格。
+set ts=4
+"Tab 宽度为 4 个字符。
+set et
+"编辑时将所有 Tab 替换为空格。
+"该选项只在编辑时将 Tab 替换为空格， 如果打开一个已经存在的文件， 并不会将已有的 Tab 替换为空格。 如果希望进行这样的替换的话， 可以使用这条命令“:retab”。
+retab
+set smarttab
+"当使用 et 将 Tab 替换为空格之后， 按下一个 Tab 键就能插入 4 个空格，
+"但要想删除这 4 个空格， 就得按 4 下 Backspace， 很不方便。 设置 smarttab
+"之后， 就可以只按一下 Backspace 就删除 4 个空格了。
 
 " Height of the command bar
 set cmdheight=2
@@ -98,9 +79,14 @@ set cmdheight=2
 " A buffer becomes hidden when it is abandoned
 set hid
 
-" Configure backspace so it acts as it should act
+"设想这样一个情况： 当前光标前面有若干字母， 我们按下 i 键进入了 Insert 模式， 然后输入了 3 个字母， 再按 5 下删除(Backspace)。 默认情况下， VIM 仅能删除我们新输入的 3 个字母， 然后喇叭“嘟嘟”响两声。 如果我们“set backspace=start”， 则可以在删除了新输入的 3 个字母之后， 继续向前删除原有的两个字符。
+"再设想一个情况： 有若干行文字， 我们把光标移到中间某一行的行首， 按 i 键进入 Insert 模式， 然后按一下 Backspace。默认情况下， 喇叭会“嘟”一声， 然后没有任何动静。 如果我们“set backspace=eol”， 则可以删除前一行行末的回车，也就是说将两行拼接起来。
+"当我们设置了自动缩进后， 如果前一行缩进了一定距离， 按下回车后， 下一行也会保持相同的缩进。 默认情况下， 我们不能在 Insert 模式下直接按 Backspace 删除行首的缩进。 如果我们“set backspace=indent”， 则可以开启这一项功能。
+"上述三项功能， 你可以根据自己的需要， 选择其中一种或几种， 用逗号分隔各个选项。 建议把这三个选项都选上。
 set backspace=eol,start,indent
-set whichwrap+=<,>,h,l
+
+set whichwrap=b,s,<,>,[,]
+"默认情况下， 在 VIM 中当光标移到一行最左边的时候， 我们继续按左键， 光标不能回到上一行的最右边。 同样地， 光标到了一行最右边的时候，我们不能通过继续按右跳到下一行的最左边。 但是， 通过设置 whichwrap 我们可以对一部分按键开启这项功能。如果想对某一个或几个按键开启到头后自动折向下一行的功能， 可以把需要开启的键的代号写到 whichwrap 的参数列表中，各个键之间使用逗号分隔。 以下是 whichwrap 支持的按键名称列表：
 
 " Ignore case when searching
 set ignorecase
@@ -108,8 +94,22 @@ set ignorecase
 " When searching try to be smart about cases 
 set smartcase
 
-" Highlight search results
+"搜索时高亮显示被找到的文本。
 set hlsearch
+
+"语法高亮。
+syntax on
+
+set pastetoggle=<F3>
+"很多兄弟都碰到过这样一个问题，在vim中粘贴代码有时会自动增加缩进，造成代码排版
+"的混乱。如何让它不缩进,保持原格式?其实vim有一个paste开关。
+"输入 :set paste
+"需要关闭时
+"输入:set nopaste
+"我是在vimrc中加入了：
+"set pastetoggle=<F3>
+"这样就可以用F3来切换了。
+
 
 " Makes search act like search in modern browsers
 set incsearch 
@@ -157,7 +157,7 @@ try
 catch
 endtry
 
-set background=dark
+" set background=dark
 
 " Set extra options when running in GUI mode
 if has("gui_running")
